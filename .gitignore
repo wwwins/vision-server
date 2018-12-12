@@ -1,0 +1,8 @@
+node_modules/
+coverage/
+test/
+npm-debug.log
+log.json
+package-lock.json
+.env
+*.swp
