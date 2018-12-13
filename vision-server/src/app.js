@@ -29,6 +29,7 @@ function processImage(res, num) {
   try {
     const process = spawn('sh', [APP_HOME+'tools/fib.sh', num]);
     process.stdout.on('data', (data) => {
+      uploadImages(num);
       res.send('async fib('+num+'):'+data.toString().split(':')[1]);
       console.log('stdout:'+data);
     })
@@ -38,6 +39,34 @@ function processImage(res, num) {
     })
     process.on('exit', (data) => {
       console.log('exit:'+data);
+    })
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function uploadImages(sno) {
+  const form = new formData();
+  form.append('filename', fs.createReadStream('public/images/tom_cruise.jpg'));
+  form.submit(API_HOST+'upload/', (err, res) => {
+    if (err) throw err;
+    console.log(res.statusCode);
+  })
+}
+
+function uploadImageWithcurl(sno) {
+  console.log('>>>>>uploadImage:',sno);
+  const src = 'public/images/'+sno+'/output.jpg';
+  try {
+    const uploader = spawn('sh', [APP_HOME+'tools/uploader.sh', HOST, sno]);
+    uploader.stdout.on('data', (data) => {
+      console.log('stdout:'+data);
+    })
+    uploader.stderr.on('data', (data) => {
+      console.log('stderr:'+data);
+    })
+    uploader.on('close', (code) => {
+      console.log('child process exited with code '+code);
     })
   } catch (err) {
     console.log(err);
