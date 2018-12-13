@@ -27,7 +27,7 @@ app.use(expressFileUpload());
 
 function processImage(res, num) {
   try {
-    const process = spawn('sh', [APP_HOME+'tools/fib.sh', num]);
+    const process = spawn('sh', [APP_HOME+'sh/fib.sh', num]);
     process.stdout.on('data', (data) => {
       uploadImages(num);
       res.send('async fib('+num+'):'+data.toString().split(':')[1]);
@@ -58,7 +58,7 @@ function uploadImageWithcurl(sno) {
   console.log('>>>>>uploadImage:',sno);
   const src = 'public/images/'+sno+'/output.jpg';
   try {
-    const uploader = spawn('sh', [APP_HOME+'tools/uploader.sh', HOST, sno]);
+    const uploader = spawn('sh', [APP_HOME+'sh/uploader.sh', HOST, sno]);
     uploader.stdout.on('data', (data) => {
       console.log('stdout:'+data);
     })
