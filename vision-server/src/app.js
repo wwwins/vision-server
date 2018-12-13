@@ -17,6 +17,7 @@ const HOST = process.env.HOST
 const PORT = (process.env.PORT || 8888)
 const APP_HOME = process.env.APP_HOME
 const API_HOST = process.env.API_HOST
+const PREDICTOR_FILE = process.env.PREDICTOR_FILE
 
 const { spawn } = require('child_process');
 
@@ -25,7 +26,28 @@ app.set('view engine', 'pug');
 app.use(express.static('public'));
 app.use(expressFileUpload());
 
-function processImage(res, num) {
+function processImage(res, uid) {
+  try {
+    const fn = APP_HOME+'public/upload/'+uid;
+    console.log("processImage:"+fn);
+    const process = spawn('sh', [APP_HOME+'sh/imageEffect.sh', PREDICTOR_FILE, fn]);
+    process.stdout.on('data', (data) => {
+      res.send('async add effect:'+uid);
+      console.log('stdout:'+data);
+    })
+    process.stderr.on('data', (data) => {
+      res.send('error');
+      console.log('stderr:'+data);
+    })
+    process.on('exit', (data) => {
+      console.log('exit:'+data);
+    })
+  } catch (err) {
+    console.log(err);
+  }
+}
+
+function processfib(res, num) {
   try {
     const process = spawn('sh', [APP_HOME+'sh/fib.sh', num]);
     process.stdout.on('data', (data) => {
@@ -75,7 +97,7 @@ function uploadImageWithcurl(sno) {
 
 app.get('/fib/:num', (req, res) => {
   const n = req.params.num;
-  processImage(res, n);
+  processfib(res, n);
   console.log('req:'+n);
 })
 
@@ -88,12 +110,15 @@ app.post('/upload/', (req, res) => {
     req.status(400).send("No file was uploaded");
   }
   let file = req.files.filename;
-  let filename = req.files.filename.name.replace(/[\/\?<>\\:\*\|":]/g, '').toLowerCase();
-  file.mv('public/upload/'+filename, (err) => {
+  // let filename = req.files.filename.name.replace(/[\/\?<>\\:\*\|":]/g, '').toLowerCase();
+  // file.mv('public/upload/'+filename, (err) => {
+    const uid = uuid();
+    file.mv('public/upload/'+uid, (err) => {
     if (err) {
       return res.status(500).send(err);
     }
-    res.send('upload success');
+    processImage(res, uid);
+    // res.send('upload success');
   })
 })
 
