@@ -1,6 +1,8 @@
 node_modules/
 coverage/
 test/
+public/
+sh/
 npm-debug.log
 log.json
 package-lock.json
