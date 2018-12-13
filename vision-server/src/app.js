@@ -9,10 +9,14 @@ const dotenv = require('dotenv').config();
 const express = require('express');
 const expressFileUpload = require('express-fileupload');
 const http = require('http');
+const uuid = require('uuid/v1');
+const formData = require('form-data');
+const fs = require('fs');
 
 const HOST = process.env.HOST
 const PORT = (process.env.PORT || 8888)
 const APP_HOME = process.env.APP_HOME
+const API_HOST = process.env.API_HOST
 
 const { spawn } = require('child_process');
 
@@ -22,18 +26,22 @@ app.use(express.static('public'));
 app.use(expressFileUpload());
 
 function processImage(res, num) {
-  const process = spawn('python', [APP_HOME+'src/fib.py', num]);
-  process.stdout.on('data', (data) => {
-    res.send('async fib('+num+'):'+data.toString().split(':')[1]);
-    console.log('stdout:'+data);
-  })
-  process.stderr.on('data', (data) => {
-    res.send('error');
-    console.log('stderr:'+data);
-  })
-  process.on('exit', (data) => {
-    console.log('exit:'+data);
-  })
+  try {
+    const process = spawn('sh', [APP_HOME+'tools/fib.sh', num]);
+    process.stdout.on('data', (data) => {
+      res.send('async fib('+num+'):'+data.toString().split(':')[1]);
+      console.log('stdout:'+data);
+    })
+    process.stderr.on('data', (data) => {
+      res.send('error');
+      console.log('stderr:'+data);
+    })
+    process.on('exit', (data) => {
+      console.log('exit:'+data);
+    })
+  } catch (err) {
+    console.log(err);
+  }
 }
 
 app.get('/fib/:num', (req, res) => {
@@ -62,8 +70,9 @@ app.post('/upload/', (req, res) => {
 
 app.get('/detect/', (req, res) => {
   const d = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
-  res.send('Success:'+d);
-  console.log('Success:'+d);
+  const uid = uuid();
+  res.send('Success:'+d+', uuid:'+uid);
+  console.log('Success:'+d+', uuid:'+uid);
 })
 
 http.createServer(app).listen(PORT);
