@@ -38,7 +38,11 @@ function processImage(res, uid) {
     console.log("processImage:"+fn);
     const process = spawn('sh', [APP_HOME+'sh/imageEffect.sh', PREDICTOR_FILE, fn]);
     process.stdout.on('data', (data) => {
-      res.send('async add effect:'+uid);
+      //res.send('async add effect:'+uid);
+      let str = Buffer.from(data).toString();
+      res.json({"file": 'result/'+uid+'/after.jpg',
+                "res": str
+              });
       console.log('stdout:'+data);
     })
     process.stderr.on('data', (data) => {
