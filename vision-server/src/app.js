@@ -12,6 +12,7 @@ const http = require('http');
 const uuid = require('uuid/v1');
 const formData = require('form-data');
 const fs = require('fs');
+const path = require('path');
 
 const HOST = process.env.HOST
 const PORT = (process.env.PORT || 8888)
@@ -19,12 +20,17 @@ const APP_HOME = process.env.APP_HOME
 const API_HOST = process.env.API_HOST
 const PREDICTOR_FILE = process.env.PREDICTOR_FILE
 
+const publicDir = path.join(APP_HOME, 'public');
+const uploadDir = path.join(publicDir, 'upload');
+
 const { spawn } = require('child_process');
 
 const app = express();
 app.set('view engine', 'pug');
 app.use(express.static('public'));
-app.use(expressFileUpload());
+app.use(expressFileUpload({
+  createParentPath: true
+}));
 
 function processImage(res, uid) {
   try {
@@ -37,7 +43,7 @@ function processImage(res, uid) {
     })
     process.stderr.on('data', (data) => {
       res.send('error');
-      console.log('stderr:'+data);
+       console.log('stderr:'+data);
     })
     process.on('exit', (data) => {
       console.log('exit:'+data);
@@ -112,8 +118,10 @@ app.post('/upload/', (req, res) => {
   let file = req.files.filename;
   // let filename = req.files.filename.name.replace(/[\/\?<>\\:\*\|":]/g, '').toLowerCase();
   // file.mv('public/upload/'+filename, (err) => {
-    const uid = uuid();
-    file.mv('public/upload/'+uid, (err) => {
+  const uid = uuid();
+  let uploadPath = path.join(uploadDir, uid);
+  console.log(uploadPath);
+  file.mv(uploadPath, (err) => {
     if (err) {
       return res.status(500).send(err);
     }
