@@ -113,7 +113,7 @@ app.get('/uploader/', (req, res) => {
 
 app.post('/upload/', (req, res) => {
   if (!req.files) {
-    req.status(400).send("No file was uploaded");
+    return res.status(400).send("No file was uploaded");
   }
   let file = req.files.filename;
   // let filename = req.files.filename.name.replace(/[\/\?<>\\:\*\|":]/g, '').toLowerCase();
