@@ -37,19 +37,28 @@ function processImage(res, uid) {
     const fn = APP_HOME+'public/upload/'+uid;
     console.log("processImage:"+fn);
     const process = spawn('sh', [APP_HOME+'sh/imageEffect.sh', PREDICTOR_FILE, fn]);
+    let bufs='';
+    let errs='';
     process.stdout.on('data', (data) => {
+      bufs = bufs + Buffer.from(data).toString();
       //res.send('async add effect:'+uid);
-      let str = Buffer.from(data).toString();
-      res.json({"file": 'result/'+uid+'/after.jpg',
-                "res": str
-              });
+      //res.json({"file": 'result/'+uid+'/after.jpg',
+      //          "res": buf
+      //        });
       console.log('stdout:'+data);
     })
     process.stderr.on('data', (data) => {
-      res.send('error');
-       console.log('stderr:'+data);
+      errs = errs + Buffer.from(data).toString();
+      //return res.send('error');
+      console.log('stderr:'+data);
     })
     process.on('exit', (data) => {
+      if (errs != "") {
+        return res.json({"file":'result/'+uid+'/after.jpg',"res":errs});
+      }
+      if (bufs != "") {
+        return res.json({"file":'result/'+uid+'/after.jpg',"res":bufs});
+      }
       console.log('exit:'+data);
     })
   } catch (err) {
@@ -87,7 +96,6 @@ function uploadImages(sno) {
 }
 
 function uploadImageWithcurl(sno) {
-  console.log('>>>>>uploadImage:',sno);
   const src = 'public/images/'+sno+'/output.jpg';
   try {
     const uploader = spawn('sh', [APP_HOME+'sh/uploader.sh', HOST, sno]);
