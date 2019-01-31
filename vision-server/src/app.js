@@ -164,6 +164,11 @@ app.get('/setLastImage/result/:uid/after.jpg', (req, res) => {
   res.send('last image uid is '+uid);
 })
 
+app.get('/lastImage/', (req, res) => {
+  const uid = db.get('LastImage').value();
+  res.json({"file":'result/'+uid+'/after.jpg'});
+})
+
 app.get('/detect/', (req, res) => {
   const d = new Date().toISOString().replace(/T/, ' ').replace(/\..+/, '');
   const uid = uuid();
