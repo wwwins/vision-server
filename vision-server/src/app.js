@@ -19,11 +19,18 @@ const PORT = (process.env.PORT || 8888)
 const APP_HOME = process.env.APP_HOME
 const API_HOST = process.env.API_HOST
 const PREDICTOR_FILE = process.env.PREDICTOR_FILE
+const DB_NAME = process.env.DB_NAME;
 
 const publicDir = path.join(APP_HOME, 'public');
 const uploadDir = path.join(publicDir, 'upload');
 
 const { spawn } = require('child_process');
+
+const low = require('lowdb');
+const FileSync = require('lowdb/adapters/FileSync');
+const adapter = new FileSync(DB_NAME);
+const db = low(adapter);
+initdb();
 
 const app = express();
 app.set('view engine', 'pug');
@@ -31,6 +38,15 @@ app.use(express.static('public'));
 app.use(expressFileUpload({
   createParentPath: true
 }));
+
+function initdb() {
+  db.defaults({}).write()
+}
+
+function setLastImage(fn) {
+  db.set('LastImage', fn)
+    .write()
+}
 
 function processImage(res, uid) {
   try {
@@ -142,9 +158,10 @@ app.post('/upload/', (req, res) => {
   })
 })
 
-app.get('/setLastImage/:uid', (req, res) => {
+app.get('/setLastImage/result/:uid/after.jpg', (req, res) => {
   const uid = req.params.uid;
-  res.send('last image is '+uid);
+  setLastImage(uid);
+  res.send('last image uid is '+uid);
 })
 
 app.get('/detect/', (req, res) => {

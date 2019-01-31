@@ -14,6 +14,7 @@
     "express": "^4.16.4",
     "express-fileupload": "^1.0.0",
     "form-data": "^2.3.3",
+    "lowdb": "^1.0.0",
     "pug": "^2.0.3",
     "uuid": "^3.3.2"
   }
