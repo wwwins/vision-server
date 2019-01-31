@@ -53,13 +53,13 @@ function processImage(res, uid) {
       console.log('stderr:'+data);
     })
     process.on('exit', (data) => {
+      console.log('exit:'+data);
       if (errs != "") {
         return res.json({"file":'result/'+uid+'/after.jpg',"res":errs});
       }
       if (bufs != "") {
         return res.json({"file":'result/'+uid+'/after.jpg',"res":bufs});
       }
-      console.log('exit:'+data);
     })
   } catch (err) {
     console.log(err);
@@ -140,6 +140,11 @@ app.post('/upload/', (req, res) => {
     processImage(res, uid);
     // res.send('upload success');
   })
+})
+
+app.get('/setLastImage/:uid', (req, res) => {
+  const uid = req.params.uid;
+  res.send('last image is '+uid);
 })
 
 app.get('/detect/', (req, res) => {
