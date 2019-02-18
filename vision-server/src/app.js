@@ -140,7 +140,7 @@ app.get('/uploader/', (req, res) => {
 })
 
 app.post('/upload/', (req, res) => {
-  if (!req.files) {
+  if (!req.files||!req.files.filename) {
     return res.status(400).send("No file was uploaded");
   }
   let file = req.files.filename;
