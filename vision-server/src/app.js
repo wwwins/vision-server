@@ -32,6 +32,8 @@ const adapter = new FileSync(DB_NAME);
 const db = low(adapter);
 initdb();
 
+const logger = require('log-timestamp')(function () { return "["+new Date().toLocaleString('en-US', {timeZone:'Asia/Taipei'})+'] %s'});
+
 const app = express();
 app.set('view engine', 'pug');
 app.use(express.static('public'));
