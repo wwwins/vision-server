@@ -16,8 +16,10 @@ const path = require('path');
 
 const HOST = process.env.HOST
 const PORT = (process.env.PORT || 8888)
+const EXT_IP = process.env.EXT_IP
 const APP_HOME = process.env.APP_HOME
-const API_HOST = process.env.API_HOST
+const ENABLE_SSL = process.env.ENABLE_SSL
+const API_HOST = (ENABLE_SSL=='true' ? 'https://' : 'http://')+EXT_IP+':'+PORT+'/'
 const PREDICTOR_FILE = process.env.PREDICTOR_FILE
 const DB_NAME = process.env.DB_NAME;
 
@@ -57,6 +59,7 @@ function processImage(res, uid) {
     const process = spawn('sh', [APP_HOME+'sh/imageEffect.sh', PREDICTOR_FILE, fn]);
     let bufs='';
     let errs='';
+    let type='0';
     process.stdout.on('data', (data) => {
       bufs = bufs + Buffer.from(data).toString();
       //res.send('async add effect:'+uid);
@@ -72,11 +75,12 @@ function processImage(res, uid) {
     })
     process.on('exit', (data) => {
       console.log('exit:'+data);
+      type = bufs.split("\n")[1].substring(5)
       if (errs != "") {
-        return res.json({"file":'result/'+uid+'/after.jpg',"res":errs});
+        return res.json({"uid":uid, "type":type, "after":API_HOST+'result/'+uid+'/after.jpg', "printing":API_HOST+'result/'+uid+'/printing.jpg', "fb":API_HOST+'result/'+uid+'/fb.jpg', "cover":API_HOST+'result/'+uid+'/cover.jpg', "call":API_HOST+'setLastImage/result/'+uid+'/after.jpg', "res":errs});
       }
       if (bufs != "") {
-        return res.json({"file":'result/'+uid+'/after.jpg',"res":bufs});
+        return res.json({"uid":uid, "type":type, "after":API_HOST+'result/'+uid+'/after.jpg', "printing":API_HOST+'result/'+uid+'/printing.jpg', "fb":API_HOST+'result/'+uid+'/fb.jpg', "cover":API_HOST+'result/'+uid+'/cover.jpg', "call":API_HOST+'setLastImage/result/'+uid+'/after.jpg', "res":bufs});
       }
     })
   } catch (err) {
@@ -168,7 +172,7 @@ app.get('/setLastImage/result/:uid/after.jpg', (req, res) => {
 
 app.get('/lastImage/', (req, res) => {
   const uid = db.get('LastImage').value();
-  res.json({"file":'result/'+uid+'/after.jpg'});
+  res.json({"file":API_HOST+'result/'+uid+'/cover.jpg'});
 })
 
 app.get('/detect/', (req, res) => {
