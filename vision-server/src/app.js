@@ -75,7 +75,12 @@ function processImage(res, uid) {
     })
     process.on('exit', (data) => {
       console.log('exit:'+data);
-      type = bufs.split("\n")[1].substring(5)
+      if (bufs.indexOf('Face not found')>-1 || bufs.indexOf('Face too small')>-1) {
+        type = "-1";
+      }
+      else {
+        type = bufs.split("\n")[1].substring(5)
+      }
       if (errs != "") {
         return res.json({"uid":uid, "type":type, "after":API_HOST+'result/'+uid+'/after.jpg', "printing":API_HOST+'result/'+uid+'/printing.jpg', "fb":API_HOST+'result/'+uid+'/fb.jpg', "cover":API_HOST+'result/'+uid+'/cover.jpg', "call":API_HOST+'setLastImage/result/'+uid+'/after.jpg', "res":errs});
       }
