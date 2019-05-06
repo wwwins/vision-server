@@ -3,7 +3,7 @@ APT_GET = sudo apt-get
 
 BASE_PATH = /Users/isobar/github2/listerine-2019/vision-server/
 DEV_CONTAINER_TAG = 2.0.0
-CONTAINER_TAG = 1.9.2
+CONTAINER_TAG = 1.9.3
 CONTAINER_VOLUME = /home/listerine-2019/vision-server/public
 HOST_VOLUME = /home/cphuang72/public
 GCS_BUCKET = listerine-2019
@@ -11,13 +11,14 @@ EXT_IP = 34.80.23.177
 INT_IP = 10.140.0.2
 CPU_CORES = 2
 MOBILE = 0
-ALPHA_BLEND = 2.0
+ALPHA_BLEND = 1.3
 BRIGHTNESS = 1.2
 SATURATION = 1.1
 MOB_BRIGHTNESS = 1.2
 MOB_SATURATION = 1.0
 DOCKER_IMAGE_NAME = isobar/docker-python-nodejs-opencv-dlib-vision
-GCR_IMAGE_NAME = asia.gcr.io/isobar-gcp-test-jacky-huang/isobar-vision-server
+GCR_IMAGE_NAME = asia.gcr.io/isobar-gcp-jnj-listerine/isobar-vision-server
+#GCR_IMAGE_NAME = asia.gcr.io/isobar-gcp-test-jacky-huang/isobar-vision-server
 
 default: show
 
